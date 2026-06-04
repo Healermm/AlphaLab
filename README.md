@@ -76,14 +76,10 @@ AlphaLab/
 ├── factor_calculator_191.py      # 191因子计算流程
 ├── factor_calculator_external.py # 外部/基本面因子计算
 │
-├── factor_portfolio.py           # 因子预处理与合成（基础版）
 ├── factor_portfolio_DWM.py       # 因子合成（支持日/周/月频）
 │
-├── ic_analysis.py                # IC分析（基础版）
-├── ic_analysis_DWM.py            # IC分析（多频率支持）
-│
-├── layer_analysis.py             # 分层测试（基础版）
-├── layer_analysis_DWM.py         # 分层测试（多频率支持）
+├── ic_analysis_DWM.py            # IC分析（支持日/周/月频）
+├── layer_analysis_DWM.py         # 分层测试（支持日/周/月频）
 │
 ├── industry_rotation.py          # 股票因子 → 行业得分聚合
 ├── etf_mapping.py                # 行业 → ETF代码映射表(需自己完善)
