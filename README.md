@@ -64,9 +64,9 @@ AlphaLab/
 ├── utils.py                      # 公共工具函数
 ├── rename.py                     # ETF数据文件重命名工具
 │
-├── data_fetcher.py               # 通过Insight SDK获取原始数据
-├── datas.py                      # 数据管理与存储
-├── data_transformer.py           # 原始数据预处理与转换
+├── data_fetcher.py               # 通过Insight SDK获取指数成分股和日频量价数据
+├── datas.py                      # 获取沪深300成分股数据及日线数据
+├── data_transformer.py           # 将宽表因子数据转换为双索引长表，并按年份分割
 │
 ├── factor_alphas.py              # 101个Alpha因子定义
 ├── factor_alphas_191.py          # 191个扩展Alpha因子定义
@@ -76,16 +76,17 @@ AlphaLab/
 ├── factor_calculator_191.py      # 191因子计算流程
 ├── factor_calculator_external.py # 外部/基本面因子计算
 │
+├── factor_portfolio.py           # 因子预处理与合成，连接因子计算与因子评价的关键桥梁
 ├── factor_portfolio_DWM.py       # 因子合成（支持日/周/月频）
 │
-├── ic_analysis_DWM.py            # IC分析（支持日/周/月频）
-├── layer_analysis_DWM.py         # 分层测试（支持日/周/月频）
+├── ic_analysis_DWM.py            # IC分析（多频率支持）
+├── layer_analysis_DWM.py         # 分层测试（多频率支持）
 │
 ├── industry_rotation.py          # 股票因子 → 行业得分聚合
-├── etf_mapping.py                # 行业 → ETF代码映射表(需自己完善)
+├── etf_mapping.py                # 行业 → ETF代码映射表
 ├── portfolio_construction.py     # 行业得分 → ETF目标权重
 │
-├── backtest_DWM_ETF_终版.py      # 回测引擎
+├── backtest_DWM_ETF.py      # 回测引擎
 │
 └── robustness_test.py            # 稳健性与参数敏感性测试
 ```
@@ -115,28 +116,33 @@ pip install pandas numpy scipy matplotlib seaborn py7zr python-dateutil
 ## 使用步骤
 
 ```bash
-# 第一步：获取原始数据（需要Insight SDK账号）
+# 第一步：获取指数成分股和日频量价数据（需要Insight SDK账号）
 python data_fetcher.py
 
-# 第二步：计算Alpha因子
+# 第二步：获取沪深300成分股及日线数据
+python datas.py
+
+# 第三步：计算Alpha因子
 python factor_calculator.py          # 101个因子
 python factor_calculator_191.py      # 191个因子（可选）
 python factor_calculator_external.py # 外部因子（可选）
 
-# 第三步：数据格式转换
+# 第四步：将宽表因子数据转换为双索引长表，并按年份分割保存
 python data_transformer.py
 
-# 第四步：因子评价
+# 第五步：因子评价
 python ic_analysis_DWM.py
 python layer_analysis_DWM.py
 
-# 第五步：因子合成（选择调仓频率）
+# 第六步：因子合成
+# factor_portfolio.py 是连接"原始因子计算"与"因子评价"的关键桥梁
+# 完成因子预处理（MAD去极值、行业中性化、标准化）和合成
 python factor_portfolio_DWM.py       # 在文件内设置 freq = 'D' / 'W' / 'M'
 
-# 第六步：运行ETF回测
+# 第七步：运行ETF回测
 python backtest_DWM_ETF_终版.py
 
-# 第七步：稳健性检验
+# 第八步：稳健性检验
 python robustness_test.py
 ```
 
@@ -167,6 +173,7 @@ RESULT_DIR       = "factor_sum_results"             # 结果输出目录
 | `freq` | `'W'` | 调仓频率：`'D'`日频 / `'W'`周频 / `'M'`月频 |
 | `n_top` | `5` | 持仓行业数量（3-5个） |
 | `weighting` | `'score'` | 权重方式：`'equal'` / `'score'` / `'risk_parity'` |
+| `initial_capital` | `1,000,000` | 初始资金（元） |
 | `commission` | `0.0001` | 单边佣金率（万分之一） |
 | `min_holding_days` | `2` | 最小持仓期（交易日） |
 | `stop_loss_single` | `0.10` | 单行业止损阈值 |
